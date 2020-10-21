@@ -3,16 +3,16 @@ function SendMail(event) {
   let form = event.target;
   let data = new FormData(form);
 
-  if (!data.get('mailer') || !data.get('receiver') || !data.get('text')) return;
+  if (!data.get('mailer') || !data.get('receiver') || !data.get('text')) return false;
 
   fetch('/api/mail', {
     method: 'POST',
     body: data
   })
     .then(res => {
-      if (!res || !res.ok) throw Error('Ошибка при оправке сообщения');
+      if (!res || !res.ok) throw Error('Ошибка при отправке письма');
       form.reset();
-      ShowAlert(true, 'Сообщение отправлено');
+      ShowAlert(true, 'Письмо отправлено');
     })
     .catch(e => ShowAlert(false, e));
 }
@@ -27,5 +27,5 @@ function ShowAlert(status, message) {
         <span aria-hidden="true">&times;</span>
       </button>
     </div>`;
-  document.body.before(div);
+  document.body.before(div.firstElementChild);
 }

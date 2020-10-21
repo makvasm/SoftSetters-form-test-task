@@ -3,10 +3,12 @@ const babel = require('gulp-babel');
 const uglify = require('gulp-uglify');
 const sourcemaps = require('gulp-sourcemaps');
 
-function buildJs() {
-  return gulp.src('./src/**/*.js')
-    .pipe(sourcemaps.init())
+function buildJs(mode = 'prod') {
+  let src = gulp.src('./src/**/*.js');
 
+  if (mode === 'dev') src = src.pipe(sourcemaps.init());
+
+  src = src
     .pipe(babel({
       presets: ['@babel/preset-env'],
       comments: false
@@ -15,13 +17,15 @@ function buildJs() {
       compress: true
     }))
 
-    .pipe(sourcemaps.write())
-    .pipe(gulp.dest('./public'));
+  if (mode === 'dev') src = src.pipe(sourcemaps.write());
+
+  return src.pipe(gulp.dest('./public'));
 }
 
 gulp.task('watchjs', () => {
-  buildJs();
-  gulp.watch('./src/**/*.js', buildJs);
+  buildJs('dev');
+  gulp.watch('./src/**/*.js', () => buildJs('dev'));
 });
 
-gulp.task('buildjs', buildJs);
+gulp.task('build-js-dev', () => buildJs('dev'));
+gulp.task('build-js-prod', () => buildJs('prod'))
